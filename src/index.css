@@ -1,13 +1,137 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.clinical-doc {
+  padding-top: 30px;
+  padding-left: 15%;
+  padding-right: 15%;
+  padding-bottom: 30px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.collapsible-section {
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease;
 }
+
+.collapsible-title {
+  background-color: #f8f9fe; 
+  color: #19357a; 
+  padding: 10px 15px;
+  border: none;
+  border-radius: 10px;
+  text-align: left;
+  font-size: 1.25rem; 
+  font-weight: bold;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collapsible-title:focus {
+  outline: none;
+}
+
+.content {
+  padding: 20px;
+  background-color: white;
+  color: #19357a;
+}
+
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #19357a;
+}
+
+
+/* Style for the collapse button */
+.collapse-button {
+  background: #4264cf; 
+  color: white;
+  border-radius: 50%; 
+  width: 25px; 
+  height: 25px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  cursor: pointer; 
+}
+
+.collapse-button::after {
+  content: '−'; 
+}
+
+.collapsible-section.collapsed .collapse-button::after {
+  content: '+'; 
+}
+
+.form-group {
+  margin-bottom: 15px;
+  padding-right: 20px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 5px;
+  resize: vertical; 
+}
+
+/* Styles for the Mental Status Exam section */
+.mental-status-exam-container .row {
+  margin-bottom: 15px;
+}
+
+.mental-status-exam-container .row label {
+  display: block; 
+  margin-bottom: 5px; 
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; 
+  margin-bottom: 10px; 
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  margin-right: 10px; 
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+
+.form-actions {
+  text-align: center; 
+}
+
+.cancel-button {
+  background-color: white; 
+  color: #19357a; 
+  border: 1px solid #19357a; 
+  padding: 10px 40px; 
+  margin-right: 20px; 
+  cursor: pointer; 
+}
+
+.submit-button {
+  background-color: #4264cf; 
+  color: white; 
+  border: 1px solid #4264cf; 
+  padding: 10px 40px;
+  cursor: pointer; 
+}
+
+.cancel-button, .submit-button {
+  font-size: 1rem; 
+  border-radius: 8px;
+  outline: none; 
+}
+
