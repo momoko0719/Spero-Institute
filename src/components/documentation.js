@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 // Define a CollapsibleSection component that manages its open/closed state
 const CollapsibleSection = ({ title, children }) => {
@@ -11,7 +11,7 @@ const CollapsibleSection = ({ title, children }) => {
 
   return (
     <div className={sectionClass}>
-      <button onClick={toggleOpen} className="collapsible-title">
+      <button type="button" onClick={toggleOpen} className="collapsible-title">
         {title}
         <span className="collapse-button"></span>
       </button>
@@ -22,18 +22,34 @@ const CollapsibleSection = ({ title, children }) => {
 
 // Main Documentation component that will render the form with collapsible sections
 export default function Documentation(props) {
+  const formRef = useRef(null);
+
+  //handle api calls
   const [apiResponse, setApiResponse] = useState(null);
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Prepare the actual data 
-    const textData = "Hello, Lambda! This is Software Dev Team!!";
+    const formData = new FormData(formRef.current);
+    const formValues = {};
+
+    // Process all form entries
+    for (let [name, value] of formData.entries()) {
+      if (formData.getAll(name).length > 1) {
+        // Handle multiple values (like checkboxes)
+        formValues[name] = formData.getAll(name);
+      } else if (value.trim() !== "") {
+        // Exclude fields that are empty
+        formValues[name] = value;
+      }
+    }
+
+    //const textData = "Hello, Lambda! This is Software Dev Team!!";
     const apiEndpoint =
       "https://vaz40kx3ck.execute-api.us-east-1.amazonaws.com/v1/upload_it";
-    const data = {
-      body: textData,
-    };
+    //const data = {
+    //body: textData,
+    //};
     const headers = {
       "Content-Type": "application/json",
     };
@@ -42,7 +58,7 @@ export default function Documentation(props) {
     fetch(apiEndpoint, {
       method: "POST",
       headers: headers,
-      body: JSON.stringify(data),
+      body: JSON.stringify(formValues),
     })
       .then((response) => {
         console.log(response.status);
@@ -58,49 +74,10 @@ export default function Documentation(props) {
       });
   };
 
-  // State for the Safety Assessment radio button selection
-  const [safetyAssessment, setSafetyAssessment] = useState("");
-
-  // Handler for changes in the Safety Assessment radio buttons
-  const handleSafetyAssessmentChange = (event) => {
-    setSafetyAssessment(event.target.value);
-  };
-
-  const [mentalState, setMentalState] = useState({
-    appearance: [],
-    speech: [],
-    eyeContact: [],
-    moterActivity: [],
-    affect: [],
-    mood: [],
-    orientation: [],
-    memory: [],
-    attention: [],
-    perception: [],
-    thoughtProcess: [],
-    thoughtContent: [],
-    behavior: [],
-    insight: [],
-    judgement: [],
-  });
-
-  const handleCheckboxChange = (category, value, isChecked) => {
-    if (isChecked) {
-      setMentalState((prevState) => ({
-        ...prevState,
-        [category]: [...prevState[category], value],
-      }));
-    } else {
-      setMentalState((prevState) => ({
-        ...prevState,
-        [category]: prevState[category].filter((item) => item !== value),
-      }));
-    }
-  };
-
-  // This function checks if a category contains a value
-  const isChecked = (category, value) => {
-    return mentalState[category].includes(value) || false;
+  const camelCaseToTitle = (text) => {
+    return text
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase());
   };
 
   const checkboxCategories = {
@@ -187,58 +164,21 @@ export default function Documentation(props) {
     judgement: ["Good", "Fair", "Poor"],
   };
 
-  const camelCaseToTitle = (text) => {
-    return text
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase());
-  };
-
-  const [useTemplate, setUseTemplate] = useState("no");
-
-  const handleTemplateChange = (event) => {
-    setUseTemplate(event.target.value);
-  };
-
-  const [acknowledged, setAcknowledged] = useState(false);
-
-  const handleAcknowledgementChange = (event) => {
-    setAcknowledged(event.target.checked);
-  };
-
-  const [patientLocatedAtHome, setPatientLocatedAtHome] = useState("");
-
-  const handleLocationChange = (event) => {
-    setPatientLocatedAtHome(event.target.value);
-  };
-
   // Render the form with multiple CollapsibleSection components
   return (
-    <form className="clinical-doc" onSubmit={handleSubmit}>
+    <form ref={formRef} className="clinical-doc" onSubmit={handleSubmit}>
       <div className="radio-group">
         <p>Was the patient located at home:</p>
-        <input
-          id="locateHomeYes"
-          type="radio"
-          name="locateHome"
-          value="yes"
-          checked={patientLocatedAtHome === "yes"}
-          onChange={handleLocationChange}
-        />
+        <input id="locateHomeYes" type="radio" name="locateHome" value="yes" />
         <label htmlFor="locateHomeYes">Yes</label>
-        <input
-          id="locateHomeNo"
-          type="radio"
-          name="locateHome"
-          value="no"
-          checked={patientLocatedAtHome === "no"}
-          onChange={handleLocationChange}
-        />
+        <input id="locateHomeNo" type="radio" name="locateHome" value="no" />
         <label htmlFor="locateHomeNo">No</label>
       </div>
       <div className="form-group">
         <textarea
           className="form-control"
           placeholder="Where were they located?"
+          name="locateHomeText"
         ></textarea>
       </div>
 
@@ -251,8 +191,6 @@ export default function Documentation(props) {
             type="radio"
             name="safetyAssessment"
             value="yes"
-            checked={safetyAssessment === "yes"}
-            onChange={handleSafetyAssessmentChange}
           />
           <label htmlFor="safetyAssessmentYes">Yes</label>
           <input
@@ -260,8 +198,6 @@ export default function Documentation(props) {
             type="radio"
             name="safetyAssessment"
             value="no"
-            checked={safetyAssessment === "no"}
-            onChange={handleSafetyAssessmentChange}
           />
           <label htmlFor="safetyAssessmentNo">No</label>
         </div>
@@ -276,13 +212,18 @@ export default function Documentation(props) {
           <textarea
             id="responseToMedication"
             className="form-control"
+            name="responseToMedicationText"
           ></textarea>
         </div>
         <div className="form-group">
           <label htmlFor="medicationConcerns">
             Medication concerns for prescribing provider:
           </label>
-          <textarea id="medicationConcerns" className="form-control"></textarea>
+          <textarea
+            id="medicationConcerns"
+            className="form-control"
+            name="medicationConcernsText"
+          ></textarea>
         </div>
       </CollapsibleSection>
 
@@ -294,13 +235,21 @@ export default function Documentation(props) {
         </div>
         <div className="form-group">
           <label htmlFor="currentSymptoms">Current Symptoms:</label>
-          <textarea id="currentSymptoms" className="form-control"></textarea>
+          <textarea
+            id="currentSymptoms"
+            className="form-control"
+            name="currentSymptomsText"
+          ></textarea>
         </div>
         <div className="form-group">
-          <label htmlFor="medicationConcerns">
+          <label htmlFor="medicationConcernsOverview">
             Medication concerns for prescribing provider:
           </label>
-          <textarea id="medicationConcerns" className="form-control"></textarea>
+          <textarea
+            id="medicationConcernsOverview"
+            className="form-control"
+            name="medicationConcernsOverviewText"
+          ></textarea>
         </div>
       </CollapsibleSection>
 
@@ -313,21 +262,14 @@ export default function Documentation(props) {
               <div className="checkbox-group">
                 {checkboxCategories[category].map((option) => (
                   <label key={option}>
-                    <input
-                      type="checkbox"
-                      name={category}
-                      value={option}
-                      checked={isChecked(category, option)}
-                      onChange={(e) =>
-                        handleCheckboxChange(category, option, e.target.checked)
-                      }
-                    />
+                    <input type="checkbox" name={category} value={option} />
                     {option}
                   </label>
                 ))}
               </div>
               <textarea
                 className="form-control"
+                name={`${category}Comment`}
                 placeholder={`Comment on ${category}`}
               />
             </div>
@@ -339,23 +281,11 @@ export default function Documentation(props) {
         <div className="radio-group">
           <label>Would you like to use Session Note Template?</label>
           <label>
-            <input
-              type="radio"
-              name="useTemplate"
-              value="yes"
-              checked={useTemplate === "yes"}
-              onChange={handleTemplateChange}
-            />
+            <input type="radio" name="useTemplate" value="yes" />
             Yes
           </label>
           <label>
-            <input
-              type="radio"
-              name="useTemplate"
-              value="no"
-              checked={useTemplate === "no"}
-              onChange={handleTemplateChange}
-            />
+            <input type="radio" name="useTemplate" value="no" />
             No
           </label>
         </div>
@@ -365,7 +295,11 @@ export default function Documentation(props) {
           <label htmlFor="patientReports">
             Patient Reports (Subjective Information):
           </label>
-          <textarea id="patientReports" className="form-control"></textarea>
+          <textarea
+            id="patientReports"
+            className="form-control"
+            name="patientReportsText"
+          ></textarea>
         </div>
         <div className="form-group">
           <label htmlFor="clinicalObservations">
@@ -374,13 +308,18 @@ export default function Documentation(props) {
           <textarea
             id="clinicalObservations"
             className="form-control"
+            name="clinicalObservationsText"
           ></textarea>
         </div>
         <div className="form-group">
           <label htmlFor="progressUpdates">
             Progress/Updates Since Last Session:
           </label>
-          <textarea id="progressUpdates" className="form-control"></textarea>
+          <textarea
+            id="progressUpdates"
+            className="form-control"
+            name="progressUpdatesText"
+          ></textarea>
         </div>
         <div className="form-group">
           <label htmlFor="clinicalInterventions">
@@ -389,36 +328,48 @@ export default function Documentation(props) {
           <textarea
             id="clinicalInterventions"
             className="form-control"
+            name="clinicalInterventionsText"
           ></textarea>
         </div>
         <div className="form-group">
           <label htmlFor="copingSkills">
             Coping Skills Reviewed or Introduced:
           </label>
-          <textarea id="copingSkills" className="form-control"></textarea>
+          <textarea
+            id="copingSkills"
+            className="form-control"
+            name="copingSkillsText"
+          ></textarea>
         </div>
         <div className="form-group">
           <label htmlFor="assessmentProgress">Assessment of Progress:</label>
-          <textarea id="assessmentProgress" className="form-control"></textarea>
+          <textarea
+            id="assessmentProgress"
+            className="form-control"
+            name="assessmentProgressText"
+          ></textarea>
         </div>
         <div className="form-group">
           <label htmlFor="plan">Plan:</label>
-          <textarea id="plan" className="form-control"></textarea>
+          <textarea
+            id="plan"
+            className="form-control"
+            name="planText"
+          ></textarea>
         </div>
         <div className="form-group">
           <label htmlFor="cptCodes">CPT Codes:</label>
-          <textarea id="cptCodes" className="form-control"></textarea>
+          <textarea
+            id="cptCodes"
+            className="form-control"
+            name="cptCodesText"
+          ></textarea>
         </div>
         <div className="form-group">
           <label>
-            <input
-              type="checkbox"
-              name="acknowledgement"
-              checked={acknowledged}
-              onChange={handleAcknowledgementChange}
-            />
-            I acknowledge that the above information is correct and has been
-            reviewed prior to submitting.
+            <input type="checkbox" name="acknowledgement" />I acknowledge that
+            the above information is correct and has been reviewed prior to
+            submitting.
           </label>
         </div>
       </CollapsibleSection>
