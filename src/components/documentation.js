@@ -22,9 +22,42 @@ const CollapsibleSection = ({ title, children }) => {
 
 // Main Documentation component that will render the form with collapsible sections
 export default function Documentation(props) {
+  const [apiResponse, setApiResponse] = useState(null);
+
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // Prepare the actual data 
+    const textData = "Hello, Lambda! This is Software Dev Team!!";
+    const apiEndpoint =
+      "https://vaz40kx3ck.execute-api.us-east-1.amazonaws.com/v1/upload_file";
+    const data = {
+      body: textData,
+    };
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    // Perform the POST request to the API endpoint
+    fetch(apiEndpoint, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        console.log(response.status);
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        // Update the state with the API response
+        setApiResponse(data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
+
   // State for the Safety Assessment radio button selection
   const [safetyAssessment, setSafetyAssessment] = useState("");
 
@@ -203,9 +236,12 @@ export default function Documentation(props) {
         <label htmlFor="locateHomeNo">No</label>
       </div>
       <div className="form-group">
-          <textarea  className="form-control" placeholder="Where were they located?"></textarea>
+        <textarea
+          className="form-control"
+          placeholder="Where were they located?"
+        ></textarea>
       </div>
-      
+
       <CollapsibleSection title="Safety Assessment">
         {/* Place for the safety assessment description*/}
         <div className="radio-group">
