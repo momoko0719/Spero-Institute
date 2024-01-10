@@ -30,7 +30,7 @@ export default function Documentation(props) {
     // Prepare the actual data 
     const textData = "Hello, Lambda! This is Software Dev Team!!";
     const apiEndpoint =
-      "https://vaz40kx3ck.execute-api.us-east-1.amazonaws.com/v1/upload_file";
+      "https://vaz40kx3ck.execute-api.us-east-1.amazonaws.com/v1/upload_it";
     const data = {
       body: textData,
     };
