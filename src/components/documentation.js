@@ -33,32 +33,46 @@ export default function Documentation(props) {
     const formData = new FormData(formRef.current);
     const formValues = {};
 
-    // Process all form entries
     for (let [name, value] of formData.entries()) {
       if (formData.getAll(name).length > 1) {
-        // Handle multiple values (like checkboxes)
-        formValues[name] = formData.getAll(name);
+        formValues[name] = JSON.stringify(formData.getAll(name));
       } else if (value.trim() !== "") {
-        // Exclude fields that are empty
         formValues[name] = value;
       }
     }
 
-    //const textData = "Hello, Lambda! This is Software Dev Team!!";
+    const fields = Object.keys(formValues);
+    const values = Object.values(formValues).map(value => typeof value === 'string' ? `'${value}'` : value);
+
+    const insertQuery = `INSERT INTO speroEHRData.form_clinic(${fields.join(', ')}) VALUES (${values.join(', ')});`;
+
+    const createTableQuery = `CREATE TABLE speroEHRData.form_clinic(locateHome VARCHAR(255),locateHomeText VARCHAR(255),safetyAssessment VARCHAR(255),responseToMedicationText VARCHAR(255),medicationConcernsText VARCHAR(255),currentSymptomsText VARCHAR(255),medicationConcernsOverviewText VARCHAR(255),appearance VARCHAR(255),appearanceComment VARCHAR(255),speech VARCHAR(255),speechComment VARCHAR(255),eyeContact VARCHAR(255),eyeContactComment VARCHAR(255),moterActivity VARCHAR(255),moterActivityComment VARCHAR(255),affect VARCHAR(255),affectComment VARCHAR(255),mood VARCHAR(255),moodComment VARCHAR(255),orientation VARCHAR(255),orientationComment VARCHAR(255),memory VARCHAR(255),memoryComment VARCHAR(255),attention VARCHAR(255),attentionComment VARCHAR(255),perception VARCHAR(255),perceptionComment VARCHAR(255),thoughtProcess VARCHAR(255),thoughtProcessComment VARCHAR(255),thoughtContent VARCHAR(255),thoughtContentComment VARCHAR(255),behavior VARCHAR(255),behaviorComment VARCHAR(255),insight VARCHAR(255),insightComment VARCHAR(255),judgement VARCHAR(255),judgementComment VARCHAR(255),useTemplate VARCHAR(255),patientReportsText VARCHAR(255),clinicalObservationsText VARCHAR(255),progressUpdatesText VARCHAR(255),clinicalInterventionsText VARCHAR(255),copingSkillsText VARCHAR(255),assessmentProgressText VARCHAR(255),planText VARCHAR(255),cptCodesText VARCHAR(255),acknowledgement VARCHAR(255));`;
+    const checkTableQuery = `SHOW TABLES LIKE 'form_clinic';`;
+
+
+    console.log(formValues);
+    console.log(insertQuery);
+    console.log(createTableQuery);
+    console.log(checkTableQuery);
+
+    const req_value = 
+    {
+      "query": insertQuery,
+      "create": createTableQuery,
+      "check": checkTableQuery  
+    }
+
     const apiEndpoint =
-      "https://vaz40kx3ck.execute-api.us-east-1.amazonaws.com/v1/upload_it";
-    //const data = {
-    //body: textData,
-    //};
+      "https://vaz40kx3ck.execute-api.us-east-1.amazonaws.com/v1/db_query";
+
     const headers = {
       "Content-Type": "application/json",
     };
 
-    // Perform the POST request to the API endpoint
     fetch(apiEndpoint, {
       method: "POST",
       headers: headers,
-      body: JSON.stringify(formValues),
+      body: JSON.stringify(req_value),
     })
       .then((response) => {
         console.log(response.status);
@@ -66,7 +80,6 @@ export default function Documentation(props) {
       })
       .then((data) => {
         console.log(data);
-        // Update the state with the API response
         setApiResponse(data);
       })
       .catch((error) => {
